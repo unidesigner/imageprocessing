@@ -17,7 +17,13 @@ public:
 	ImageStackHdf5Reader(
 		const std::string& filename,
 		const std::string& groupname,
-		const std::string& datasetname);
+		const std::string& datasetname,
+		unsigned int firstSection,
+		unsigned int lastSection,
+		unsigned int minX,
+		unsigned int maxX,
+		unsigned int minY,
+		unsigned int maxY);
 
 private:
 
@@ -33,6 +39,15 @@ private:
 
 	// the name of the dataset that contains the image stack
 	std::string _datasetname;
+
+	// bounding box of Region of Interest
+	unsigned int _minX;
+	unsigned int _maxX;
+	unsigned int _minY;
+	unsigned int _maxY;
+
+	unsigned int _firstSection;
+	unsigned int _lastSection;
 
 	pipeline::Output<ImageStack> _stack;
 };
