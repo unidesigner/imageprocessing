@@ -9,8 +9,8 @@ ImageStackHdf5Reader::ImageStackHdf5Reader(
 		const std::string& filename,
 		const std::string& groupname,
 		const std::string& datasetname,
-		unsigned int firstSection,
-		unsigned int lastSection,
+		unsigned int originSection,
+		unsigned int targetSection,
 		unsigned int minX,
 		unsigned int maxX,
 		unsigned int minY,
@@ -18,8 +18,8 @@ ImageStackHdf5Reader::ImageStackHdf5Reader(
 	_filename(filename),
 	_groupname(groupname),
 	_datasetname(datasetname),
-	_firstSection(firstSection),
-	_lastSection(lastSection),
+	_originSection(originSection),
+	_targetSection(targetSection),
 	_minX(minX),
 	_maxX(maxX),
 	_minY(minY),
@@ -46,7 +46,7 @@ ImageStackHdf5Reader::readImages() {
 	H5::Group group;
 	std::vector<unsigned char> data;
 
-	for (int i = _firstSection; i <= _lastSection; i++) {
+	for (int i = _originSection; i <= _targetSection; i++) {
 
 		std::stringstream finalgroupname;
 
@@ -62,9 +62,9 @@ ImageStackHdf5Reader::readImages() {
 		// get the dimensions
 		std::vector<size_t> dims = hdf5::dimensions(group, _datasetname);
 
-		unsigned int width    = dims[0];
-		unsigned int height   = dims[1];
-		unsigned int sections = dims[2];
+		unsigned int height    = dims[0];
+		unsigned int width     = dims[1];
+		unsigned int sections  = dims[2];
 
 		unsigned int roiwidth;
 		unsigned int roiheight;
@@ -80,10 +80,15 @@ ImageStackHdf5Reader::readImages() {
 		// create a shared float vector that stores the actual data
 		boost::shared_ptr<std::vector<float> > imageData = boost::make_shared<std::vector<float> >(roiwidth*roiheight);
 
-		LOG_DEBUG(imagestackhdf5readerlog) << "roi width and height" << roiwidth << ", " << roiheight << std::endl;
+		LOG_DEBUG(imagestackhdf5readerlog) << "section width and height " << width << ", " << height << std::endl;
+		LOG_DEBUG(imagestackhdf5readerlog) << "roi width and height " << roiwidth << ", " << roiheight << std::endl;
 
 		for (int j = 0; j < roiwidth*roiheight; j++) {
 			(*imageData)[j] = (float)data[ ((_minY + j / roiwidth) * width + _minX) + j % roiwidth ]/255.0;
+			/*if( (*imageData)[j] > 0.39)
+				LOG_DEBUG(imagestackhdf5readerlog) << (*imageData)[j] << std::endl;*/
+			//LOG_DEBUG(imagestackhdf5readerlog) << "((_minY + j / roiwidth) * width + _minX) + j percent roiwidth " <<","<< _minY<<","<<j<<","<<roiwidth<<","<<width<<","<<_minX<<","<<j<<","<<roiwidth << std::endl;
+			//LOG_DEBUG(imagestackhdf5readerlog) << "value " << ((_minY + j / roiwidth) * width + _minX) + j % roiwidth << "," << (*imageData)[j] << std::endl;
 		}
 
 		boost::shared_ptr<Image> section = boost::make_shared<Image>(roiwidth, roiheight, imageData);
@@ -92,7 +97,7 @@ ImageStackHdf5Reader::readImages() {
 
 	}
 
-	LOG_DEBUG(imagestackhdf5readerlog) << "read sections from " << _firstSection << " to " << _lastSection << std::endl;
+	LOG_DEBUG(imagestackhdf5readerlog) << "read sections from " << _originSection << " to " << _targetSection << std::endl;
 }
 
 #endif // HAVE_HDF5

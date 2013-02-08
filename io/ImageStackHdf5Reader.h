@@ -18,8 +18,8 @@ public:
 		const std::string& filename,
 		const std::string& groupname,
 		const std::string& datasetname,
-		unsigned int firstSection,
-		unsigned int lastSection,
+		unsigned int originSection,
+		unsigned int targetSection,
 		unsigned int minX,
 		unsigned int maxX,
 		unsigned int minY,
@@ -46,8 +46,8 @@ private:
 	unsigned int _minY;
 	unsigned int _maxY;
 
-	unsigned int _firstSection;
-	unsigned int _lastSection;
+	unsigned int _originSection;
+	unsigned int _targetSection;
 
 	pipeline::Output<ImageStack> _stack;
 };
