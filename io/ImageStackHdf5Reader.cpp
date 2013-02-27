@@ -40,6 +40,8 @@ ImageStackHdf5Reader::readImages() {
 	// open file
 	H5::H5File file(_filename, H5F_ACC_RDONLY);
 
+	LOG_DEBUG(imagestackhdf5readerlog) << "reading from file: " << _filename << std::endl;
+
 	// clear the previous stack
 	_stack->clear();
 
